@@ -1,0 +1,1262 @@
+{
+  "public.project_members": [
+    {
+      "name": "project_id",
+      "definition": "uuid not null references public.projects(id) on delete cascade"
+    },
+    {
+      "name": "employee_id",
+      "definition": "uuid not null references public.employees(id) on delete cascade"
+    },
+    {
+      "name": "role",
+      "definition": "text not null default 'member'"
+    },
+    {
+      "name": "added_by",
+      "definition": "uuid not null references public.profiles(id)"
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "primary",
+      "definition": "key (project_id"
+    },
+    {
+      "name": "employee_id)",
+      "definition": ""
+    }
+  ],
+  "public.clients": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "name",
+      "definition": "text not null unique"
+    },
+    {
+      "name": "company_name",
+      "definition": "text"
+    },
+    {
+      "name": "email",
+      "definition": "text"
+    },
+    {
+      "name": "phone",
+      "definition": "text"
+    },
+    {
+      "name": "notes",
+      "definition": "text"
+    },
+    {
+      "name": "status",
+      "definition": "text not null default 'lead' check (status in ('lead'"
+    },
+    {
+      "name": "'active'",
+      "definition": ""
+    },
+    {
+      "name": "'inactive'",
+      "definition": ""
+    },
+    {
+      "name": "'archived'))",
+      "definition": ""
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "created_by",
+      "definition": "uuid references public.profiles(id)"
+    },
+    {
+      "name": "updated_by",
+      "definition": "uuid references public.profiles(id)"
+    }
+  ],
+  "public.teams": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "name",
+      "definition": "text not null unique"
+    },
+    {
+      "name": "description",
+      "definition": "text"
+    },
+    {
+      "name": "department_id",
+      "definition": "uuid references public.departments(id) on delete set null"
+    },
+    {
+      "name": "lead_employee_id",
+      "definition": "uuid references public.employees(id) on delete set null"
+    },
+    {
+      "name": "status",
+      "definition": "text not null default 'active' check (status in ('active'"
+    },
+    {
+      "name": "'inactive'",
+      "definition": ""
+    },
+    {
+      "name": "'archived'))",
+      "definition": ""
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "created_by",
+      "definition": "uuid references public.profiles(id)"
+    },
+    {
+      "name": "updated_by",
+      "definition": "uuid references public.profiles(id)"
+    }
+  ],
+  "public.team_members": [
+    {
+      "name": "team_id",
+      "definition": "uuid not null references public.teams(id) on delete cascade"
+    },
+    {
+      "name": "employee_id",
+      "definition": "uuid not null references public.employees(id) on delete cascade"
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "primary",
+      "definition": "key (team_id"
+    },
+    {
+      "name": "employee_id)",
+      "definition": ""
+    }
+  ],
+  "public.work_schedules": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "name",
+      "definition": "text not null"
+    },
+    {
+      "name": "timezone",
+      "definition": "text not null default 'UTC'"
+    },
+    {
+      "name": "monday_start",
+      "definition": "time"
+    },
+    {
+      "name": "monday_end",
+      "definition": "time"
+    },
+    {
+      "name": "tuesday_start",
+      "definition": "time"
+    },
+    {
+      "name": "tuesday_end",
+      "definition": "time"
+    },
+    {
+      "name": "wednesday_start",
+      "definition": "time"
+    },
+    {
+      "name": "wednesday_end",
+      "definition": "time"
+    },
+    {
+      "name": "thursday_start",
+      "definition": "time"
+    },
+    {
+      "name": "thursday_end",
+      "definition": "time"
+    },
+    {
+      "name": "friday_start",
+      "definition": "time"
+    },
+    {
+      "name": "friday_end",
+      "definition": "time"
+    },
+    {
+      "name": "saturday_start",
+      "definition": "time"
+    },
+    {
+      "name": "saturday_end",
+      "definition": "time"
+    },
+    {
+      "name": "sunday_start",
+      "definition": "time"
+    },
+    {
+      "name": "sunday_end",
+      "definition": "time"
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "created_by",
+      "definition": "uuid references public.profiles(id)"
+    },
+    {
+      "name": "updated_by",
+      "definition": "uuid references public.profiles(id)"
+    }
+  ],
+  "public.schedule_assignments": [
+    {
+      "name": "schedule_id",
+      "definition": "uuid not null references public.work_schedules(id) on delete cascade"
+    },
+    {
+      "name": "employee_id",
+      "definition": "uuid not null references public.employees(id) on delete cascade"
+    },
+    {
+      "name": "starts_on",
+      "definition": "date not null default current_date"
+    },
+    {
+      "name": "ends_on",
+      "definition": "date"
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "primary",
+      "definition": "key (schedule_id"
+    },
+    {
+      "name": "employee_id",
+      "definition": ""
+    },
+    {
+      "name": "starts_on)",
+      "definition": ""
+    },
+    {
+      "name": "check",
+      "definition": "(ends_on is null or ends_on >= starts_on)"
+    }
+  ],
+  "public.holidays": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "name",
+      "definition": "text not null"
+    },
+    {
+      "name": "holiday_date",
+      "definition": "date not null unique"
+    },
+    {
+      "name": "description",
+      "definition": "text"
+    },
+    {
+      "name": "is_company_wide",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "department_id",
+      "definition": "uuid references public.departments(id) on delete cascade"
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "created_by",
+      "definition": "uuid references public.profiles(id)"
+    },
+    {
+      "name": "updated_by",
+      "definition": "uuid references public.profiles(id)"
+    },
+    {
+      "name": "check",
+      "definition": "(is_company_wide or department_id is not null)"
+    }
+  ],
+  "public.task_checklist_items": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "task_id",
+      "definition": "uuid not null references public.tasks(id) on delete cascade"
+    },
+    {
+      "name": "title",
+      "definition": "text not null check (length(trim(title)) between 1 and 500)"
+    },
+    {
+      "name": "is_completed",
+      "definition": "boolean not null default false"
+    },
+    {
+      "name": "position",
+      "definition": "integer not null default 0 check (position >= 0)"
+    },
+    {
+      "name": "created_by",
+      "definition": "uuid not null references public.profiles(id)"
+    },
+    {
+      "name": "updated_by",
+      "definition": "uuid references public.profiles(id)"
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "unique",
+      "definition": "(task_id"
+    },
+    {
+      "name": "position)",
+      "definition": ""
+    }
+  ],
+  "public.task_dependencies": [
+    {
+      "name": "task_id",
+      "definition": "uuid not null references public.tasks(id) on delete cascade"
+    },
+    {
+      "name": "depends_on_task_id",
+      "definition": "uuid not null references public.tasks(id) on delete cascade"
+    },
+    {
+      "name": "created_by",
+      "definition": "uuid not null references public.profiles(id)"
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "primary",
+      "definition": "key (task_id"
+    },
+    {
+      "name": "depends_on_task_id)",
+      "definition": ""
+    },
+    {
+      "name": "check",
+      "definition": "(task_id <> depends_on_task_id)"
+    }
+  ],
+  "public.time_entries": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "task_id",
+      "definition": "uuid not null references public.tasks(id) on delete cascade"
+    },
+    {
+      "name": "employee_id",
+      "definition": "uuid not null references public.employees(id) on delete cascade"
+    },
+    {
+      "name": "started_at",
+      "definition": "timestamptz not null"
+    },
+    {
+      "name": "ended_at",
+      "definition": "timestamptz"
+    },
+    {
+      "name": "duration_seconds",
+      "definition": "integer generated always as (case when ended_at is null then null else greatest(0"
+    },
+    {
+      "name": "extract(epoch",
+      "definition": "from (ended_at - started_at))::integer) end) stored"
+    },
+    {
+      "name": "notes",
+      "definition": "text"
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "check",
+      "definition": "(ended_at is null or ended_at > started_at)"
+    }
+  ],
+  "public.notification_preferences": [
+    {
+      "name": "profile_id",
+      "definition": "uuid primary key references public.profiles(id) on delete cascade"
+    },
+    {
+      "name": "task_notifications",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "report_notifications",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "leave_notifications",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "mention_notifications",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "announcement_notifications",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    }
+  ],
+  "public.feed_posts": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "author_id",
+      "definition": "uuid not null references public.profiles(id) on delete cascade"
+    },
+    {
+      "name": "team_id",
+      "definition": "uuid references public.teams(id) on delete cascade"
+    },
+    {
+      "name": "project_id",
+      "definition": "uuid references public.projects(id) on delete cascade"
+    },
+    {
+      "name": "body",
+      "definition": "text not null check (length(trim(body)) between 1 and 10000)"
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "constraint",
+      "definition": "feed_post_context_check check (team_id is not null or project_id is not null)"
+    }
+  ],
+  "public.feed_comments": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "post_id",
+      "definition": "uuid not null references public.feed_posts(id) on delete cascade"
+    },
+    {
+      "name": "author_id",
+      "definition": "uuid not null references public.profiles(id) on delete cascade"
+    },
+    {
+      "name": "parent_comment_id",
+      "definition": "uuid references public.feed_comments(id) on delete cascade"
+    },
+    {
+      "name": "body",
+      "definition": "text not null check (length(trim(body)) between 1 and 5000)"
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    }
+  ],
+  "public.reactions": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "actor_id",
+      "definition": "uuid not null references public.profiles(id) on delete cascade"
+    },
+    {
+      "name": "entity_type",
+      "definition": "text not null check (entity_type in ('feed_post'"
+    },
+    {
+      "name": "'feed_comment'",
+      "definition": ""
+    },
+    {
+      "name": "'announcement'",
+      "definition": ""
+    },
+    {
+      "name": "'task_comment'))",
+      "definition": ""
+    },
+    {
+      "name": "entity_id",
+      "definition": "uuid not null"
+    },
+    {
+      "name": "reaction",
+      "definition": "text not null check (reaction in ('like'"
+    },
+    {
+      "name": "'celebrate'",
+      "definition": ""
+    },
+    {
+      "name": "'support'",
+      "definition": ""
+    },
+    {
+      "name": "'important'))",
+      "definition": ""
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "unique",
+      "definition": "(actor_id"
+    },
+    {
+      "name": "entity_type",
+      "definition": ""
+    },
+    {
+      "name": "entity_id",
+      "definition": ""
+    },
+    {
+      "name": "reaction)",
+      "definition": ""
+    }
+  ],
+  "public.mentions": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "actor_id",
+      "definition": "uuid not null references public.profiles(id) on delete cascade"
+    },
+    {
+      "name": "mentioned_profile_id",
+      "definition": "uuid not null references public.profiles(id) on delete cascade"
+    },
+    {
+      "name": "entity_type",
+      "definition": "text not null check (entity_type in ('feed_post'"
+    },
+    {
+      "name": "'feed_comment'",
+      "definition": ""
+    },
+    {
+      "name": "'task_comment'))",
+      "definition": ""
+    },
+    {
+      "name": "entity_id",
+      "definition": "uuid not null"
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "unique",
+      "definition": "(mentioned_profile_id"
+    },
+    {
+      "name": "entity_type",
+      "definition": ""
+    },
+    {
+      "name": "entity_id)",
+      "definition": ""
+    }
+  ],
+  "public.automation_jobs": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "job_type",
+      "definition": "text not null check (job_type in ('overdue_task_notifications'"
+    },
+    {
+      "name": "'missing_daily_report_reminders'))",
+      "definition": ""
+    },
+    {
+      "name": "idempotency_key",
+      "definition": "text not null unique"
+    },
+    {
+      "name": "status",
+      "definition": "text not null default 'pending' check (status in ('pending'"
+    },
+    {
+      "name": "'running'",
+      "definition": ""
+    },
+    {
+      "name": "'completed'",
+      "definition": ""
+    },
+    {
+      "name": "'failed'))",
+      "definition": ""
+    },
+    {
+      "name": "payload",
+      "definition": "jsonb not null default '{}'::jsonb"
+    },
+    {
+      "name": "attempts",
+      "definition": "integer not null default 0 check (attempts >= 0)"
+    },
+    {
+      "name": "locked_at",
+      "definition": "timestamptz"
+    },
+    {
+      "name": "completed_at",
+      "definition": "timestamptz"
+    },
+    {
+      "name": "last_error",
+      "definition": "text"
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default timezone('utc'"
+    },
+    {
+      "name": "now())",
+      "definition": ""
+    }
+  ],
+  "public.employee_documents": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "employee_id",
+      "definition": "uuid not null references public.employees(id) on delete cascade"
+    },
+    {
+      "name": "storage_path",
+      "definition": "text not null"
+    },
+    {
+      "name": "file_name",
+      "definition": "text not null"
+    },
+    {
+      "name": "mime_type",
+      "definition": "text"
+    },
+    {
+      "name": "file_size",
+      "definition": "integer"
+    },
+    {
+      "name": "description",
+      "definition": "text"
+    },
+    {
+      "name": "category",
+      "definition": "text not null default 'employee'"
+    },
+    {
+      "name": "version",
+      "definition": "integer not null default 1"
+    },
+    {
+      "name": "uploaded_by",
+      "definition": "uuid not null references public.profiles(id)"
+    },
+    {
+      "name": "uploaded_at",
+      "definition": "timestamptz not null default now()"
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default now()"
+    }
+  ],
+  "public.project_documents": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "project_id",
+      "definition": "uuid not null references public.projects(id) on delete cascade"
+    },
+    {
+      "name": "storage_path",
+      "definition": "text not null"
+    },
+    {
+      "name": "file_name",
+      "definition": "text not null"
+    },
+    {
+      "name": "mime_type",
+      "definition": "text"
+    },
+    {
+      "name": "file_size",
+      "definition": "integer"
+    },
+    {
+      "name": "description",
+      "definition": "text"
+    },
+    {
+      "name": "category",
+      "definition": "text not null default 'project'"
+    },
+    {
+      "name": "version",
+      "definition": "integer not null default 1"
+    },
+    {
+      "name": "uploaded_by",
+      "definition": "uuid not null references public.profiles(id)"
+    },
+    {
+      "name": "uploaded_at",
+      "definition": "timestamptz not null default now()"
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default now()"
+    }
+  ],
+  "public.company_documents": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "storage_path",
+      "definition": "text not null"
+    },
+    {
+      "name": "file_name",
+      "definition": "text not null"
+    },
+    {
+      "name": "mime_type",
+      "definition": "text"
+    },
+    {
+      "name": "file_size",
+      "definition": "integer"
+    },
+    {
+      "name": "description",
+      "definition": "text"
+    },
+    {
+      "name": "category",
+      "definition": "text not null default 'company'"
+    },
+    {
+      "name": "version",
+      "definition": "integer not null default 1"
+    },
+    {
+      "name": "uploaded_by",
+      "definition": "uuid not null references public.profiles(id)"
+    },
+    {
+      "name": "uploaded_at",
+      "definition": "timestamptz not null default now()"
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default now()"
+    }
+  ],
+  "public.sops": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "title",
+      "definition": "text not null"
+    },
+    {
+      "name": "content",
+      "definition": "text not null"
+    },
+    {
+      "name": "category",
+      "definition": "text not null default 'sop'"
+    },
+    {
+      "name": "version",
+      "definition": "integer not null default 1"
+    },
+    {
+      "name": "effective_from",
+      "definition": "date"
+    },
+    {
+      "name": "effective_to",
+      "definition": "date"
+    },
+    {
+      "name": "owner_id",
+      "definition": "uuid references public.profiles(id)"
+    },
+    {
+      "name": "storage_path",
+      "definition": "text"
+    },
+    {
+      "name": "is_active",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default now()"
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default now()"
+    }
+  ],
+  "public.templates": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "name",
+      "definition": "text not null"
+    },
+    {
+      "name": "category",
+      "definition": "text not null default 'template'"
+    },
+    {
+      "name": "description",
+      "definition": "text"
+    },
+    {
+      "name": "storage_path",
+      "definition": "text"
+    },
+    {
+      "name": "is_active",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "owner_id",
+      "definition": "uuid references public.profiles(id)"
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default now()"
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default now()"
+    }
+  ],
+  "public.knowledge_base_attachments": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "knowledge_base_id",
+      "definition": "uuid"
+    },
+    {
+      "name": "--",
+      "definition": "reference to knowledge base articles (would need separate table) storage_path text not null"
+    },
+    {
+      "name": "file_name",
+      "definition": "text not null"
+    },
+    {
+      "name": "mime_type",
+      "definition": "text"
+    },
+    {
+      "name": "file_size",
+      "definition": "integer"
+    },
+    {
+      "name": "title",
+      "definition": "text"
+    },
+    {
+      "name": "tags",
+      "definition": "text[]"
+    },
+    {
+      "name": "uploaded_by",
+      "definition": "uuid not null references public.profiles(id)"
+    },
+    {
+      "name": "uploaded_at",
+      "definition": "timestamptz not null default now()"
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default now()"
+    }
+  ],
+  "storage_events": [
+    {
+      "name": "id",
+      "definition": "bigint generated by default as identity primary key"
+    },
+    {
+      "name": "type",
+      "definition": "text not null"
+    },
+    {
+      "name": "entity_id",
+      "definition": "uuid not null"
+    },
+    {
+      "name": "bucket",
+      "definition": "text not null"
+    },
+    {
+      "name": "file_path",
+      "definition": "text not null"
+    },
+    {
+      "name": "performed_by",
+      "definition": "uuid not null references auth.users(id)"
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamp with time zone default now()"
+    }
+  ],
+  "public.organization_settings": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "organization_name",
+      "definition": "text not null default 'My Organization'"
+    },
+    {
+      "name": "timezone",
+      "definition": "text not null default 'UTC'"
+    },
+    {
+      "name": "default_work_week",
+      "definition": "text[] not null default array['monday'"
+    },
+    {
+      "name": "'tuesday'",
+      "definition": ""
+    },
+    {
+      "name": "'wednesday'",
+      "definition": ""
+    },
+    {
+      "name": "'thursday'",
+      "definition": ""
+    },
+    {
+      "name": "'friday']",
+      "definition": ""
+    },
+    {
+      "name": "default_work_start_time",
+      "definition": "time not null default '09:00:00'"
+    },
+    {
+      "name": "default_work_end_time",
+      "definition": "time not null default '18:00:00'"
+    },
+    {
+      "name": "max_file_upload_mb",
+      "definition": "integer not null default 25 check (max_file_upload_mb between 1 and 500)"
+    },
+    {
+      "name": "default_leave_days_per_year",
+      "definition": "integer not null default 20 check (default_leave_days_per_year >= 0)"
+    },
+    {
+      "name": "allow_employee_feed_post",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "allow_employee_comment",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default now()"
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default now()"
+    }
+  ],
+  "public.user_notification_preferences": [
+    {
+      "name": "id",
+      "definition": "uuid primary key default gen_random_uuid()"
+    },
+    {
+      "name": "profile_id",
+      "definition": "uuid not null references public.profiles(id) on delete cascade"
+    },
+    {
+      "name": "notify_task_assigned",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "notify_task_overdue",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "notify_leave_status",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "notify_mention",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "notify_comment_reply",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "notify_announcement",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "notify_report_reviewed",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "notify_team_change",
+      "definition": "boolean not null default true"
+    },
+    {
+      "name": "email_notifications",
+      "definition": "boolean not null default false"
+    },
+    {
+      "name": "created_at",
+      "definition": "timestamptz not null default now()"
+    },
+    {
+      "name": "updated_at",
+      "definition": "timestamptz not null default now()"
+    },
+    {
+      "name": "unique",
+      "definition": "(profile_id)"
+    }
+  ],
+  "public.activity_logs_archive": [
+    {
+      "name": "like",
+      "definition": "public.activity_logs including all"
+    }
+  ]
+}

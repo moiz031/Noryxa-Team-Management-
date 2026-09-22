@@ -1,0 +1,49 @@
+{
+  "name": "agency-team-management-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint src scripts",
+    "typecheck": "tsc --noEmit",
+    "test": "jest --runInBand",
+    "test:unit": "jest --runInBand tests/unit",
+    "test:integration": "jest --runInBand tests/integration",
+    "test:integration:live": "node --env-file=.env.local scripts/run-live-tests.mjs",
+    "supabase": "node node_modules/supabase/dist/supabase.js",
+    "provision:first-admin": "node --env-file=.env.local scripts/provision-first-admin.mjs",
+    "verify:routes": "node --env-file=.env.local scripts/verify-protected-routes.mjs",
+    "verify:rls": "node --env-file=.env.local scripts/verify-rls.mjs",
+    "verify:load": "node --env-file=.env.local scripts/verify-live-load.mjs"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.1",
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "^2.57.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.468.0",
+    "next": "16.3.4",
+    "pg": "^8.23.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-hook-form": "^7.62.0",
+    "tailwind-merge": "^3.3.1",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.4",
+    "jest": "^30.5.1",
+    "tailwindcss": "^4",
+    "ts-jest": "^29.4.12",
+    "typescript": "^5"
+  }
+}
