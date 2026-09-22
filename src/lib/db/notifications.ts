@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getNotificationSectionKey, type NotificationSectionKey } from "@/lib/notifications/sections";
 
 export type Notification = {
   id: string;
@@ -18,6 +19,32 @@ export type NotificationListParams = {
   page?: number;
   pageSize?: number;
 };
+
+export type NotificationSummary = {
+  unreadCount: number;
+  sections: Partial<Record<NotificationSectionKey, number>>;
+};
+
+export async function getNotificationSummary(recipientId: string): Promise<NotificationSummary> {
+  const supabase = await createSupabaseServerClient();
+  const { data, count, error } = await supabase
+    .from("notifications")
+    .select("entity_type, type", { count: "exact" })
+    .eq("recipient_id", recipientId)
+    .is("read_at", null)
+    .order("created_at", { ascending: false })
+    .limit(500);
+
+  if (error) throw new Error(`Failed to fetch notification summary: ${error.message}`);
+
+  const sections: Partial<Record<NotificationSectionKey, number>> = {};
+  for (const notification of data ?? []) {
+    const section = getNotificationSectionKey(notification.entity_type, notification.type);
+    sections[section] = (sections[section] ?? 0) + 1;
+  }
+
+  return { unreadCount: count ?? data?.length ?? 0, sections };
+}
 
 export async function getNotifications(params: NotificationListParams = {}): Promise<{ notifications: Notification[]; total: number }> {
   const supabase = await createSupabaseServerClient();

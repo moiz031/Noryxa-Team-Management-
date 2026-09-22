@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Sparkles,
@@ -7,11 +8,8 @@ import {
   ArrowRight,
   Activity,
   Layers,
-  Database,
   Lock,
   Cpu,
-  Clock,
-  FolderKanban,
   CheckCircle2,
 } from "lucide-react";
 
@@ -71,11 +69,8 @@ export default function Home() {
       {/* Top Navigation */}
       <header className="relative z-20 mx-auto flex max-w-7xl items-center justify-between px-6 py-6 lg:px-10 border-b border-white/[0.06]">
         <div className="flex items-center gap-3">
-          <div className="grid size-10 place-items-center rounded-xl bg-gradient-to-br from-[#39FF14] to-[#24C5E3] font-black text-[#07090D] shadow-[0_0_20px_rgba(57,255,20,0.4)]">
-            <span className="text-lg font-black tracking-tighter">N</span>
-          </div>
-          <div>
-            <span className="text-sm font-bold tracking-wider text-[#F5F7FA]">NORYXA</span>
+          <Image src="/noryxa-logo.svg" alt="Noryxa Digital Solution" width={180} height={68} priority className="h-12 w-auto" />
+          <div className="hidden sm:block">
             <span className="block text-[10px] tracking-tight text-[#6B7280]">
               Agency Command Center
             </span>

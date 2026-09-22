@@ -3,6 +3,7 @@ import { withRateLimit } from '@/lib/api/rate-limit';
 import { requireUser } from '@/lib/auth/roles';
 import {
   getNotifications,
+  getNotificationSummary,
   createNotification,
   markNotificationAsRead,
   markAllNotificationsAsRead,
@@ -34,6 +35,9 @@ async function getHandler(request: Request): Promise<Response> {
   try {
     const user = await requireUser();
     const url = new URL(request.url);
+    if (url.searchParams.get('summary') === 'true') {
+      return NextResponse.json(await getNotificationSummary(user.user.id));
+    }
     const unreadOnly = url.searchParams.get('unread') === 'true';
     const page = Math.max(1, parseInt(url.searchParams.get('page') ?? '1', 10));
     const pageSize = Math.min(

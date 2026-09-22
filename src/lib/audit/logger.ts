@@ -163,6 +163,50 @@ export function extractClientIp(req?: Request | Headers | null): string | null {
   return null;
 }
 
+async function dispatchActivityNotifications(params: {
+  activityId: string;
+  actorId?: string | null;
+  event: string;
+  entityType: string | null;
+  entityId: string | null;
+  source: AuditSource;
+}) {
+  if (params.event === "notification.generated" || params.event === "activity.viewed") return;
+
+  const admin = createSupabaseAdminClient();
+  const { data: profiles, error: profilesError } = await admin
+    .from("profiles")
+    .select("id, roles!inner(code)")
+    .eq("is_active", true);
+  if (profilesError) throw profilesError;
+
+  const recipients = new Set<string>();
+  for (const profile of profiles ?? []) {
+    const roleValue = (profile as { roles?: { code?: string } | { code?: string }[] }).roles;
+    const role = Array.isArray(roleValue) ? roleValue[0]?.code : roleValue?.code;
+    if (role === "admin") recipients.add(profile.id as string);
+  }
+  if (params.actorId) recipients.add(params.actorId);
+  if (recipients.size === 0) return;
+
+  const label = params.event.replace(/[._]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+  const { error } = await admin.from("notifications").upsert(
+    [...recipients].map((recipientId) => ({
+      recipient_id: recipientId,
+      actor_id: params.actorId ?? null,
+      type: "activity",
+      title: `New activity: ${label}`,
+      body: `${params.entityType ? params.entityType.replace(/_/g, " ") : "System"} activity was recorded.`,
+      entity_type: params.entityType,
+      entity_id: params.entityId,
+      metadata: { activity_log_id: params.activityId, source: params.source },
+      dedupe_key: `activity:${params.activityId}:${recipientId}`,
+    })),
+    { onConflict: "dedupe_key", ignoreDuplicates: true },
+  );
+  if (error) throw error;
+}
+
 /**
  * Type-safe, scrubbed enterprise audit logger.
  * 
@@ -194,7 +238,7 @@ export async function logAuditEvent(params: LogAuditParams): Promise<void> {
       const sessionUser = (await serverClient.auth.getUser()).data.user;
 
       if (sessionUser && (!actorId || actorId === sessionUser.id)) {
-        const { error } = await serverClient.rpc("log_activity", {
+        const { data, error } = await serverClient.rpc("log_activity", {
           p_action_type: event,
           p_entity_type: entityType,
           p_entity_id: entityId,
@@ -204,7 +248,24 @@ export async function logAuditEvent(params: LogAuditParams): Promise<void> {
           p_org_context: orgContext,
         });
 
-        if (!error) return;
+        if (!error) {
+          const activityId = (data as { id?: string } | null)?.id;
+          if (activityId) {
+            try {
+              await dispatchActivityNotifications({
+                activityId,
+                actorId,
+                event,
+                entityType,
+                entityId,
+                source,
+              });
+            } catch (notificationError) {
+              console.error("Activity notification dispatch failed:", notificationError);
+            }
+          }
+          return;
+        }
       }
     } catch {
       // If serverClient cannot be initialized (e.g. background worker or no cookies), continue to admin client
@@ -212,7 +273,7 @@ export async function logAuditEvent(params: LogAuditParams): Promise<void> {
 
     // Direct insert via privileged admin client (service_role)
     const admin = createSupabaseAdminClient();
-    await admin.from("activity_logs").insert({
+    const { data: activity, error: activityError } = await admin.from("activity_logs").insert({
       actor_id: actorId || null,
       action_type: event,
       entity_type: entityType,
@@ -221,6 +282,15 @@ export async function logAuditEvent(params: LogAuditParams): Promise<void> {
       source: source,
       ip_address: ip,
       org_context: orgContext,
+    }).select("id").single();
+    if (activityError) throw activityError;
+    await dispatchActivityNotifications({
+      activityId: activity.id,
+      actorId,
+      event,
+      entityType,
+      entityId,
+      source,
     });
   } catch (err) {
     // Audit logging failure must not crash the parent transaction/request

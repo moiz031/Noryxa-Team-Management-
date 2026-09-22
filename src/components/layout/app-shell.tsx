@@ -3,6 +3,8 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
+import { createBrowserClient } from "@supabase/ssr";
 import {
   Sparkles,
   CheckSquare,
@@ -31,12 +33,15 @@ import {
 } from "lucide-react";
 import { CommandPalette } from "@/components/ui/command-palette";
 import { cn } from "@/lib/utils";
+import { getPublicEnv } from "@/lib/env";
+import type { NotificationSectionKey } from "@/lib/notifications/sections";
 
 interface AppShellProps {
   children: React.ReactNode;
   role?: "admin" | "employee";
   userEmail?: string;
   unreadCount?: number;
+  unreadBySection?: Partial<Record<NotificationSectionKey, number>>;
 }
 
 export function AppShell({
@@ -44,11 +49,47 @@ export function AppShell({
   role = "employee",
   userEmail,
   unreadCount = 0,
+  unreadBySection = {},
 }: AppShellProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = React.useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = React.useState(false);
+  const [liveUnreadCount, setLiveUnreadCount] = React.useState(unreadCount);
+  const [sectionUnread, setSectionUnread] = React.useState<Partial<Record<NotificationSectionKey, number>>>(unreadBySection);
+
+  const refreshNotificationSummary = React.useCallback(async () => {
+    try {
+      const response = await fetch("/api/notifications?summary=true", { cache: "no-store" });
+      if (!response.ok) return;
+      const summary = (await response.json()) as {
+        unreadCount?: number;
+        sections?: Partial<Record<NotificationSectionKey, number>>;
+      };
+      setLiveUnreadCount(summary.unreadCount ?? 0);
+      setSectionUnread(summary.sections ?? {});
+    } catch {
+      // Notification badges are enhancement-only and must never block navigation.
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const initialLoadTimer = setTimeout(() => void refreshNotificationSummary(), 0);
+    const env = getPublicEnv();
+    const client = createBrowserClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+    const channel = client.channel("noryxa-notification-status");
+    let refreshTimer: ReturnType<typeof setTimeout> | undefined;
+    channel.on("postgres_changes", { event: "*", schema: "public", table: "notifications" }, () => {
+      if (refreshTimer) clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(() => void refreshNotificationSummary(), 150);
+    });
+    channel.subscribe();
+    return () => {
+      clearTimeout(initialLoadTimer);
+      if (refreshTimer) clearTimeout(refreshTimer);
+      void client.removeChannel(channel);
+    };
+  }, [refreshNotificationSummary]);
 
   // Global Cmd+K / Ctrl+K shortcut listener
   React.useEffect(() => {
@@ -67,23 +108,23 @@ export function AppShell({
     {
       title: "Core Hub",
       items: [
-        { label: "Dashboard", href: "/dashboard", icon: Sparkles },
-        { label: "My Tasks", href: "/tasks", icon: CheckSquare },
-        { label: "Projects", href: "/projects", icon: FolderKanban },
+        { label: "Dashboard", href: "/dashboard", icon: Sparkles, sectionKey: "dashboard" as const },
+        { label: "My Tasks", href: "/tasks", icon: CheckSquare, sectionKey: "tasks" as const },
+        { label: "Projects", href: "/projects", icon: FolderKanban, sectionKey: "projects" as const },
       ],
     },
     {
       title: "Operations",
       items: [
-        { label: "Daily Reports", href: "/reports", icon: Clock },
-        { label: "Attendance", href: "/attendance", icon: UserCheck },
-        { label: "Leave Requests", href: "/leave", icon: Calendar },
-        { label: "Announcements", href: "/announcements", icon: Megaphone },
-        { label: "Team Feed", href: "/feed", icon: Users },
-        { label: "Documents", href: "/documents", icon: FileText },
-        { label: "Notifications", href: "/notifications", icon: Bell },
-        { label: "Analytics", href: "/analytics", icon: Activity },
-        { label: "My Scorecard", href: "/scorecard", icon: Zap },
+        { label: "Daily Reports", href: "/reports", icon: Clock, sectionKey: "reports" as const },
+        { label: "Attendance", href: "/attendance", icon: UserCheck, sectionKey: "attendance" as const },
+        { label: "Leave Requests", href: "/leave", icon: Calendar, sectionKey: "leave" as const },
+        { label: "Announcements", href: "/announcements", icon: Megaphone, sectionKey: "announcements" as const },
+        { label: "Team Feed", href: "/feed", icon: Users, sectionKey: "feed" as const },
+        { label: "Documents", href: "/documents", icon: FileText, sectionKey: "documents" as const },
+        { label: "Notifications", href: "/notifications", icon: Bell, sectionKey: "notifications" as const },
+        { label: "Analytics", href: "/analytics", icon: Activity, sectionKey: "analytics" as const },
+        { label: "My Scorecard", href: "/scorecard", icon: Zap, sectionKey: "scorecard" as const },
       ],
     },
   ];
@@ -93,28 +134,28 @@ export function AppShell({
     {
       title: "Command Center",
       items: [
-        { label: "Overview", href: "/admin", icon: Shield },
-        { label: "Projects", href: "/admin/projects", icon: FolderKanban },
-        { label: "Tasks", href: "/admin/tasks", icon: CheckSquare },
-        { label: "Employees", href: "/admin/employees", icon: Users },
-        { label: "Departments", href: "/admin/departments", icon: Building2 },
-        { label: "Teams", href: "/admin/teams", icon: Layers },
+        { label: "Overview", href: "/admin", icon: Shield, sectionKey: "dashboard" as const },
+        { label: "Projects", href: "/admin/projects", icon: FolderKanban, sectionKey: "projects" as const },
+        { label: "Tasks", href: "/admin/tasks", icon: CheckSquare, sectionKey: "tasks" as const },
+        { label: "Employees", href: "/admin/employees", icon: Users, sectionKey: "employees" as const },
+        { label: "Departments", href: "/admin/departments", icon: Building2, sectionKey: "departments" as const },
+        { label: "Teams", href: "/admin/teams", icon: Layers, sectionKey: "teams" as const },
       ],
     },
     {
       title: "Agency Operations",
       items: [
-        { label: "Clients", href: "/admin/clients", icon: Building2 },
-        { label: "Daily Reports", href: "/admin/daily-reports", icon: ClipboardList },
-        { label: "Attendance", href: "/admin/attendance", icon: UserCheck },
-        { label: "Leave Requests", href: "/admin/leave", icon: Calendar },
-        { label: "Schedules", href: "/admin/schedules", icon: Clock },
-        { label: "Holidays", href: "/admin/holidays", icon: CalendarDays },
-        { label: "Announcements", href: "/admin/announcements", icon: Megaphone },
-        { label: "Activity Audit", href: "/admin/activity", icon: Activity },
-        { label: "Analytics", href: "/admin/analytics", icon: Activity },
-        { label: "Team Scorecards", href: "/admin/scorecards", icon: Zap },
-        { label: "Organization Settings", href: "/admin/settings", icon: Settings },
+        { label: "Clients", href: "/admin/clients", icon: Building2, sectionKey: "clients" as const },
+        { label: "Daily Reports", href: "/admin/daily-reports", icon: ClipboardList, sectionKey: "reports" as const },
+        { label: "Attendance", href: "/admin/attendance", icon: UserCheck, sectionKey: "attendance" as const },
+        { label: "Leave Requests", href: "/admin/leave", icon: Calendar, sectionKey: "leave" as const },
+        { label: "Schedules", href: "/admin/schedules", icon: Clock, sectionKey: "schedules" as const },
+        { label: "Holidays", href: "/admin/holidays", icon: CalendarDays, sectionKey: "schedules" as const },
+        { label: "Announcements", href: "/admin/announcements", icon: Megaphone, sectionKey: "announcements" as const },
+        { label: "Activity Audit", href: "/admin/activity", icon: Activity, sectionKey: "notifications" as const },
+        { label: "Analytics", href: "/admin/analytics", icon: Activity, sectionKey: "analytics" as const },
+        { label: "Team Scorecards", href: "/admin/scorecards", icon: Zap, sectionKey: "scorecard" as const },
+        { label: "Organization Settings", href: "/admin/settings", icon: Settings, sectionKey: "settings" as const },
       ],
     },
   ];
@@ -137,12 +178,10 @@ export function AppShell({
             </button>
 
             <Link href={role === "admin" ? "/admin" : "/dashboard"} className="flex items-center gap-3">
-              <div className="relative grid size-9 place-items-center rounded-xl bg-gradient-to-br from-[#39FF14] to-[#24C5E3] font-black text-[#07090D] shadow-[0_0_16px_rgba(57,255,20,0.35)]">
-                <span className="text-base font-extrabold tracking-tighter">N</span>
-              </div>
+              <Image src="/noryxa-mark.svg" alt="Noryxa" width={40} height={40} priority className="size-9 sm:hidden" />
+              <Image src="/noryxa-logo.svg" alt="Noryxa Digital Solution" width={178} height={46} priority className="hidden h-10 w-auto sm:block" />
               <div className="hidden sm:block">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold tracking-wider text-[#F5F7FA]">NORYXA</span>
                   <span className="rounded-full bg-[#39FF14]/10 px-2 py-0.5 text-[10px] font-semibold text-[#39FF14] border border-[#39FF14]/20">
                     {role === "admin" ? "ADMIN" : "OS"}
                   </span>
@@ -186,9 +225,9 @@ export function AppShell({
               title="Notifications"
             >
               <Bell className="size-4" />
-              {unreadCount > 0 && (
+              {liveUnreadCount > 0 && (
                 <span className="absolute -right-1 -top-1 grid size-4 place-items-center rounded-full bg-[#39FF14] text-[9px] font-bold text-[#07090D] shadow-[0_0_8px_rgba(57,255,20,0.6)]">
-                  {unreadCount > 9 ? "9+" : unreadCount}
+                  {liveUnreadCount > 9 ? "9+" : liveUnreadCount}
                 </span>
               )}
             </Link>
@@ -243,8 +282,8 @@ export function AppShell({
                 <p className="mt-1 text-[11px] text-[#6B7280]">Production Environment</p>
               </div>
             ) : (
-              <div className="grid size-11 mx-auto place-items-center rounded-xl bg-[#11151C] border border-white/[0.08]">
-                <Zap className="size-4 text-[#39FF14]" />
+              <div className="mx-auto grid size-11 place-items-center rounded-xl bg-[#11151C] border border-white/[0.08]">
+                <Image src="/noryxa-mark.svg" alt="Noryxa" width={36} height={36} className="size-8" />
               </div>
             )}
           </div>
@@ -287,6 +326,9 @@ export function AppShell({
                           isActive ? "text-[#39FF14]" : "text-[#A7AFBC] group-hover:text-white"
                         )}
                       />
+                      {Boolean(sectionUnread[item.sectionKey]) && (
+                        <span className="absolute right-2 top-2 size-2 rounded-full bg-[#39FF14] shadow-[0_0_8px_rgba(57,255,20,0.9)]" aria-label="Unread activity" />
+                      )}
                       {!collapsed && <span className="truncate">{item.label}</span>}
                     </Link>
                   );
@@ -319,10 +361,8 @@ export function AppShell({
             />
             <div className="relative z-10 w-72 h-full bg-[#0A0D12] border-r border-white/10 p-5 flex flex-col animate-drawer-in">
               <div className="flex items-center justify-between pb-4 border-b border-white/10">
-                <div className="flex items-center gap-2">
-                  <div className="grid size-8 place-items-center rounded-xl bg-gradient-to-br from-[#39FF14] to-[#24C5E3] font-bold text-[#07090D]">
-                    N
-                  </div>
+                  <div className="flex items-center gap-2">
+                    <Image src="/noryxa-mark.svg" alt="NoryXA" width={32} height={32} className="size-8" />
                   <span className="text-sm font-bold tracking-wider">NORYXA</span>
                 </div>
                 <button
@@ -357,6 +397,9 @@ export function AppShell({
                         >
                           <Icon className="size-4" />
                           <span>{item.label}</span>
+                          {Boolean(sectionUnread[item.sectionKey]) && (
+                            <span className="ml-auto size-2 rounded-full bg-[#39FF14] shadow-[0_0_8px_rgba(57,255,20,0.9)]" aria-label="Unread activity" />
+                          )}
                         </Link>
                       );
                     })}

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
@@ -133,13 +134,9 @@ export function AuthCard({
         {/* Brand Header */}
         <div className="flex items-center justify-between pb-4">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="grid size-8 place-items-center rounded-xl bg-gradient-to-br from-[#39FF14] to-[#24C5E3] font-black text-[#07090D] shadow-[0_0_14px_rgba(57,255,20,0.4)]">
-              <span className="text-sm font-extrabold">N</span>
-            </div>
+            <Image src="/noryxa-mark.svg" alt="Noryxa" width={34} height={34} priority className="size-8" />
             <div>
-              <span className="text-xs font-bold tracking-wider text-[#F5F7FA]">
-                NORYXA
-              </span>
+              <Image src="/noryxa-logo.svg" alt="Noryxa Digital Solution" width={156} height={58} priority className="h-10 w-auto object-contain object-left" />
               <span className="block text-[9px] text-[#6B7280]">
                 AGENCY OPERATING SYSTEM
               </span>
