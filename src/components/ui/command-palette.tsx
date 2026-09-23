@@ -45,6 +45,8 @@ const quickLinks = [
   { label: "Attendance", href: "/attendance", icon: Clock, category: "Navigation" },
   { label: "Announcements", href: "/announcements", icon: Megaphone, category: "Navigation" },
   { label: "Team Feed", href: "/feed", icon: Users, category: "Navigation" },
+  { label: "Community", href: "/community", icon: Users, category: "Navigation" },
+  { label: "Learn & Tips", href: "/learn", icon: FileText, category: "Navigation" },
   { label: "Documents", href: "/documents", icon: FileText, category: "Navigation" },
 ];
 
