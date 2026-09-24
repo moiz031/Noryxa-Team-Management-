@@ -98,6 +98,39 @@ export async function markAllNotificationsAsRead(recipientId: string): Promise<n
   return count ?? 0;
 }
 
+export async function markNotificationsInSectionAsRead(
+  recipientId: string,
+  section: NotificationSectionKey,
+): Promise<number> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("notifications")
+    .select("id, entity_type, type")
+    .eq("recipient_id", recipientId)
+    .is("read_at", null)
+    .order("created_at", { ascending: false })
+    .limit(500);
+
+  if (error) throw new Error(`Failed to find section notifications: ${error.message}`);
+
+  const ids = (data ?? [])
+    .filter((notification) => getNotificationSectionKey(notification.entity_type, notification.type) === section)
+    .map((notification) => notification.id);
+
+  if (ids.length === 0) return 0;
+
+  const { data: updatedRows, error: updateError } = await supabase
+    .from("notifications")
+    .update({ read_at: new Date().toISOString() })
+    .in("id", ids)
+    .eq("recipient_id", recipientId)
+    .is("read_at", null)
+    .select("id");
+
+  if (updateError) throw new Error(`Failed to mark section notifications as read: ${updateError.message}`);
+  return updatedRows?.length ?? ids.length;
+}
+
 export type CreateNotificationInput = {
   recipient_id: string;
   type: string;

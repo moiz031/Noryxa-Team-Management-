@@ -80,6 +80,7 @@ export function AppShell({
     const client = createBrowserClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
     const channel = client.channel("noryxa-notification-status");
     let refreshTimer: ReturnType<typeof setTimeout> | undefined;
+    const pollingTimer = setInterval(() => void refreshNotificationSummary(), 15_000);
     channel.on("postgres_changes", { event: "*", schema: "public", table: "notifications" }, () => {
       if (refreshTimer) clearTimeout(refreshTimer);
       refreshTimer = setTimeout(() => void refreshNotificationSummary(), 150);
@@ -88,6 +89,7 @@ export function AppShell({
     return () => {
       clearTimeout(initialLoadTimer);
       if (refreshTimer) clearTimeout(refreshTimer);
+      clearInterval(pollingTimer);
       void client.removeChannel(channel);
     };
   }, [refreshNotificationSummary]);
@@ -169,6 +171,33 @@ export function AppShell({
   ];
 
   const navSections = role === "admin" ? adminNavSections : employeeNavSections;
+
+  const currentSectionKey = React.useMemo(() => {
+    for (const section of navSections) {
+      const item = section.items.find((candidate) =>
+        pathname === candidate.href ||
+        (candidate.href !== "/admin" && candidate.href !== "/dashboard" && pathname.startsWith(candidate.href)),
+      );
+      if (item) return item.sectionKey;
+    }
+    return undefined;
+  }, [navSections, pathname]);
+
+  React.useEffect(() => {
+    if (!currentSectionKey) return;
+    const payload = pathname === "/notifications"
+      ? { markAllRead: true }
+      : { markSectionRead: true, section: currentSectionKey };
+    void fetch("/api/notifications", {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    }).then((response) => {
+      if (response.ok) void refreshNotificationSummary();
+    }).catch(() => {
+      // Read-state updates are best-effort and must never block navigation.
+    });
+  }, [currentSectionKey, pathname, refreshNotificationSummary]);
 
   return (
     <div className="min-h-screen bg-[#07090D] text-[#F5F7FA] flex flex-col antialiased noryxa-grid-bg">

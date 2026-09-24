@@ -7,8 +7,16 @@ import {
   createNotification,
   markNotificationAsRead,
   markAllNotificationsAsRead,
+  markNotificationsInSectionAsRead,
   type CreateNotificationInput,
 } from '@/lib/db/notifications';
+import type { NotificationSectionKey } from '@/lib/notifications/sections';
+
+const notificationSections = [
+  'dashboard', 'tasks', 'projects', 'employees', 'departments', 'teams', 'clients', 'reports',
+  'attendance', 'leave', 'schedules', 'announcements', 'feed', 'learning', 'earnings',
+  'documents', 'notifications', 'analytics', 'scorecard', 'settings',
+] as const;
 import { z } from 'zod';
 
 const createNotificationSchema = z.object({
@@ -23,8 +31,13 @@ const createNotificationSchema = z.object({
 const readNotificationSchema = z.object({
   id: z.string().uuid().optional(),
   markAllRead: z.boolean().optional(),
-}).refine((value) => Boolean(value.id) !== Boolean(value.markAllRead), {
-  message: 'Provide exactly one of id or markAllRead',
+  markSectionRead: z.boolean().optional(),
+  section: z.enum(notificationSections).optional(),
+}).superRefine((value, context) => {
+  const sectionRead = value.markSectionRead === true && Boolean(value.section);
+  if ([Boolean(value.id), value.markAllRead === true, sectionRead].filter(Boolean).length !== 1) {
+    context.addIssue({ code: 'custom', message: 'Provide exactly one read-state action' });
+  }
 });
 
 /**
@@ -122,6 +135,12 @@ async function patchHandler(request: Request): Promise<Response> {
     if (parsed.data.markAllRead) {
       await markAllNotificationsAsRead(user.user.id);
       return NextResponse.json({ updated: true, scope: 'all' });
+    }
+
+    if (parsed.data.markSectionRead) {
+      const section = parsed.data.section as NotificationSectionKey;
+      const updated = await markNotificationsInSectionAsRead(user.user.id, section);
+      return NextResponse.json({ updated: true, scope: 'section', section, count: updated });
     }
 
     const notification = await markNotificationAsRead(parsed.data.id!, user.user.id);
