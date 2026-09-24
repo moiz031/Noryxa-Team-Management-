@@ -13,6 +13,7 @@ export type NotificationSectionKey =
   | "announcements"
   | "feed"
   | "learning"
+  | "earnings"
   | "documents"
   | "notifications"
   | "analytics"
@@ -44,6 +45,7 @@ export function getNotificationSectionKey(
   if (value.includes("announcement")) return "announcements";
   if (value.includes("feed") || value.includes("comment") || value.includes("mention") || value.includes("reaction")) return "feed";
   if (value.includes("learning") || value.includes("academy") || value.includes("sop") || value.includes("training")) return "learning";
+  if (value.includes("earning") || value.includes("commission") || value.includes("payout") || value.includes("revenue")) return "earnings";
   if (value.includes("document") || value.includes("file") || value.includes("attachment")) return "documents";
   if (value.includes("analytic") || value.includes("scorecard")) return "analytics";
   if (value.includes("setting")) return "settings";

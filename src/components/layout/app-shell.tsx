@@ -30,6 +30,7 @@ import {
   Layers,
   Activity,
   Settings,
+  Wallet,
 } from "lucide-react";
 import { CommandPalette } from "@/components/ui/command-palette";
 import { cn } from "@/lib/utils";
@@ -123,6 +124,7 @@ export function AppShell({
         { label: "Team Feed", href: "/feed", icon: Users, sectionKey: "feed" as const },
         { label: "Community", href: "/community", icon: Users, sectionKey: "feed" as const },
         { label: "Learn & Tips", href: "/learn", icon: FileText, sectionKey: "learning" as const },
+        { label: "My Earnings", href: "/earnings", icon: Wallet, sectionKey: "earnings" as const },
         { label: "Documents", href: "/documents", icon: FileText, sectionKey: "documents" as const },
         { label: "Notifications", href: "/notifications", icon: Bell, sectionKey: "notifications" as const },
         { label: "Analytics", href: "/analytics", icon: Activity, sectionKey: "analytics" as const },
@@ -157,6 +159,7 @@ export function AppShell({
         { label: "Community", href: "/community", icon: Users, sectionKey: "feed" as const },
         { label: "Learn & Tips", href: "/learn", icon: FileText, sectionKey: "learning" as const },
         { label: "Academy Manager", href: "/admin/learn", icon: Sparkles, sectionKey: "learning" as const },
+        { label: "Revenue & Earnings", href: "/admin/earnings", icon: Wallet, sectionKey: "earnings" as const },
         { label: "Activity Audit", href: "/admin/activity", icon: Activity, sectionKey: "notifications" as const },
         { label: "Analytics", href: "/admin/analytics", icon: Activity, sectionKey: "analytics" as const },
         { label: "Team Scorecards", href: "/admin/scorecards", icon: Zap, sectionKey: "scorecard" as const },

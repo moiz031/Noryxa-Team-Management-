@@ -41,6 +41,7 @@ declare module "lucide-react" {
   export const Command: LucideIcon;
   export const Cpu: LucideIcon;
   export const Database: LucideIcon;
+  export const DollarSign: LucideIcon;
   export const Download: LucideIcon;
   export const Edit: LucideIcon;
   export const Eye: LucideIcon;
@@ -58,6 +59,7 @@ declare module "lucide-react" {
   export const Home: LucideIcon;
   export const Info: LucideIcon;
   export const Layers: LucideIcon;
+  export const Link2: LucideIcon;
   export const Loader2: LucideIcon;
   export const Lock: LucideIcon;
   export const LogOut: LucideIcon;
@@ -96,6 +98,7 @@ declare module "lucide-react" {
   export const UserPlus: LucideIcon;
   export const Users: LucideIcon;
   export const Video: LucideIcon;
+  export const Wallet: LucideIcon;
   export const UserX: LucideIcon;
   export const X: LucideIcon;
   export const XCircle: LucideIcon;
