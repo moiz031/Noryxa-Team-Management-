@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/roles";
 import { getDepartments } from "@/lib/db/departments";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input, Select, Textarea } from "@/components/ui/input";
@@ -18,23 +19,30 @@ export default async function NewEmployeePage() {
     const jobTitle = formData.get("jobTitle") as string;
     const departmentId = formData.get("departmentId") as string;
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/api/admin/employees`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: fullName?.trim(),
-          email: email?.trim(),
-          jobTitle: jobTitle?.trim() || undefined,
-          departmentId: departmentId || undefined,
-        }),
-      }
-    );
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Authentication required");
 
-    if (res.ok) {
-      redirect("/admin/employees");
+    const { data: existingProfiles, error: existingError } = await supabase.from("profiles").select("id").ilike("email", email).limit(1);
+    if (existingError) throw new Error(`Could not check duplicate email: ${existingError.message}`);
+    if (existingProfiles?.length) throw new Error("An account with this email already exists");
+
+    const { data: invited, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, { data: { full_name: fullName } });
+    if (inviteError || !invited.user) throw new Error(inviteError?.message ?? "Invitation failed");
+
+    const { error: profileError } = await supabase.from("profiles").update({ email, full_name: fullName, phone: null }).eq("id", invited.user.id);
+    if (profileError) {
+      await supabase.auth.admin.deleteUser(invited.user.id);
+      throw new Error(`Profile creation failed: ${profileError.message}`);
     }
+
+    const { data: employee, error: employeeError } = await supabase.from("employees").update({ department_id: departmentId || null, job_title: jobTitle || null, employment_status: "pending", created_by: user.id, updated_by: user.id }).eq("profile_id", invited.user.id).select("id, profile_id, employment_status").single();
+    if (employeeError || !employee) {
+      await supabase.auth.admin.deleteUser(invited.user.id);
+      throw new Error(employeeError?.message ?? "Employee record creation failed");
+    }
+
+    redirect("/admin/employees");
   }
 
   return (

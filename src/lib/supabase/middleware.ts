@@ -33,10 +33,11 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/forgot-password") || pathname.startsWith("/reset-password") || pathname.startsWith("/admin/login") || pathname.startsWith("/auth");
   const isCronRoute = pathname === "/api/cron/automation";
+  const isPublicRoute = pathname === "/" || pathname.startsWith("/community") || pathname.startsWith("/feed") || pathname === "/robots.txt" || pathname === "/sitemap.xml";
 
   // Cron is intentionally sessionless; the route handler authenticates it with
   // CRON_SECRET instead of allowing the browser-session redirect to intercept it.
-  if (!user && !isAuthRoute && !isCronRoute) return NextResponse.redirect(new URL("/login", request.url));
+  if (!user && !isAuthRoute && !isCronRoute && !isPublicRoute) return NextResponse.redirect(new URL("/login", request.url));
   if (user && ["/login", "/register", "/admin/login"].includes(pathname)) return NextResponse.redirect(new URL("/dashboard", request.url));
   if (user && (pathname.startsWith("/admin") || pathname.startsWith("/dashboard"))) {
     const { data: profile } = await supabase.from("profiles").select("is_active, roles!inner(code)").eq("id", user.id).maybeSingle();

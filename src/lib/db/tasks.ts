@@ -19,6 +19,7 @@ export type Task = {
   updated_by: string | null;
   projects?: { id: string; name: string; status: string } | null;
   employees?: { id: string; profiles: { full_name: string | null; email: string | null } } | null;
+  created_by_profiles?: { full_name: string | null; email: string | null } | null;
 };
 
 export type TaskListParams = {
@@ -43,7 +44,8 @@ export async function getTasks(params: TaskListParams = {}): Promise<{ tasks: Ta
     .select(
       `*,
       projects!left(id, name, status),
-      employees!left(id, profiles!employees_profile_id_fkey(full_name, email))`,
+      employees!left(id, profiles!employees_profile_id_fkey(full_name, email)),
+      created_by_profiles:profiles!tasks_created_by_fkey(full_name, email)`,
       { count: "exact" }
     )
     .order("created_at", { ascending: false })
@@ -68,7 +70,8 @@ export async function getTaskById(id: string): Promise<Task | null> {
     .select(
       `*,
       projects!left(id, name, status),
-      employees!left(id, profiles!employees_profile_id_fkey(full_name, email))`
+      employees!left(id, profiles!employees_profile_id_fkey(full_name, email)),
+      created_by_profiles:profiles!tasks_created_by_fkey(full_name, email)`
     )
     .eq("id", id)
     .maybeSingle();

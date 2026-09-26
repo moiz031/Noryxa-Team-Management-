@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/roles";
 import { getDepartments } from "@/lib/db/departments";
 import { listBatch2 } from "@/lib/db/batch2";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createProject } from "@/lib/db/projects";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input, Select, Textarea } from "@/components/ui/input";
@@ -28,32 +30,28 @@ export default async function NewProjectPage() {
     "use server";
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
-    const status = formData.get("status") as string;
+    const status = formData.get("status") as "planning" | "active" | "on_hold" | "completed" | "archived";
     const departmentId = formData.get("departmentId") as string;
     const clientId = formData.get("clientId") as string;
     const startsOn = formData.get("startsOn") as string;
     const dueOn = formData.get("dueOn") as string;
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/api/admin/projects`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name?.trim(),
-          description: description?.trim() || undefined,
-          status: status || "planning",
-          department_id: departmentId || undefined,
-          client_id: clientId || undefined,
-          starts_on: startsOn || undefined,
-          due_on: dueOn || undefined,
-        }),
-      }
-    );
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Authentication required");
 
-    if (res.ok) {
-      redirect("/admin/projects");
-    }
+    const project = await createProject({
+      name: name?.trim(),
+      description: description?.trim() || null,
+      status: status || "planning",
+      department_id: departmentId || null,
+      client_id: clientId || null,
+      starts_on: startsOn || null,
+      due_on: dueOn || null,
+      created_by: user.id,
+    });
+
+    redirect("/admin/projects");
   }
 
   return (

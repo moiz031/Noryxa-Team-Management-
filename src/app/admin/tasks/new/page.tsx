@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/roles";
 import { getProjects } from "@/lib/db/projects";
 import { getEmployees } from "@/lib/db/employees";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createTask } from "@/lib/db/tasks";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input, Select, Textarea } from "@/components/ui/input";
@@ -30,30 +32,26 @@ export default async function NewTaskPage() {
     const description = formData.get("description") as string;
     const projectId = formData.get("projectId") as string;
     const assignedTo = formData.get("assignedTo") as string;
-    const priority = formData.get("priority") as string;
-    const status = formData.get("status") as string;
+    const priority = formData.get("priority") as "low" | "medium" | "high" | "urgent";
+    const status = formData.get("status") as "backlog" | "todo" | "in_progress" | "blocked" | "review" | "completed" | "cancelled";
     const dueAt = formData.get("dueAt") as string;
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/api/admin/tasks`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: title?.trim(),
-          description: description?.trim() || undefined,
-          project_id: projectId || undefined,
-          assigned_to: assignedTo || undefined,
-          priority: priority || "medium",
-          status: status || "pending",
-          due_at: dueAt || undefined,
-        }),
-      }
-    );
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Authentication required");
 
-    if (res.ok) {
-      redirect("/admin/tasks");
-    }
+    const task = await createTask({
+      title: title?.trim(),
+      description: description?.trim() || null,
+      project_id: projectId || null,
+      assigned_to: assignedTo || null,
+      priority: priority || "medium",
+      status: status || "pending",
+      due_at: dueAt || null,
+      created_by: user.id,
+    });
+
+    redirect("/admin/tasks");
   }
 
   return (

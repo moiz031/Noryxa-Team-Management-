@@ -13,6 +13,9 @@ import {
   Globe,
   Check,
   Users,
+  Share2,
+  Flag,
+  Link2,
 } from "lucide-react";
 
 type Profile = { full_name: string | null; email: string | null } | Array<{ full_name: string | null; email: string | null }> | null;
@@ -68,6 +71,8 @@ export function CommunityFeed() {
   const [submitting, setSubmitting] = React.useState(false);
   const [busyKey, setBusyKey] = React.useState<string | null>(null);
   const [message, setMessage] = React.useState("");
+  const [openMenu, setOpenMenu] = React.useState<string | null>(null);
+  const [pinnedPosts, setPinnedPosts] = React.useState<Set<string>>(new Set());
 
   const loadPosts = React.useCallback(async () => {
     try {
@@ -159,6 +164,40 @@ export function CommunityFeed() {
     }
   }
 
+  function toggleMenu(postId: string) {
+    setOpenMenu((prev) => (prev === postId ? null : postId));
+  }
+
+  async function togglePin(postId: string) {
+    setPinnedPosts((prev) => {
+      const next = new Set(prev);
+      if (next.has(postId)) {
+        next.delete(postId);
+      } else {
+        next.add(postId);
+      }
+      return next;
+    });
+    setOpenMenu(null);
+  }
+
+  async function copyPostLink(postId: string) {
+    const link = `${window.location.origin}/community#post-${postId}`;
+    try {
+      await navigator.clipboard.writeText(link);
+      setMessage("Post link copied to clipboard.");
+    } catch {
+      setMessage(link);
+    }
+    setOpenMenu(null);
+  }
+
+  async function reportPost(postId: string) {
+    // In a real app, this would call an API to report the post
+    setMessage("Post reported. Thank you for keeping our community safe.");
+    setOpenMenu(null);
+  }
+
   const visiblePosts = posts
     .filter((post) => !search.trim() || `${post.body} ${authorName(post.profiles)}`.toLowerCase().includes(search.toLowerCase()))
     .filter((post) => sort !== "mine" || post.author_id === viewerId)
@@ -206,10 +245,30 @@ export function CommunityFeed() {
         {visiblePosts.map((post) => {
           const name = authorName(post.profiles);
           const totalReactions = Object.values(post.reactionCounts).reduce((x, y) => x + y, 0);
-          return <article id={`post-${post.id}`} key={post.id} className="rounded-2xl border border-white/[0.08] bg-[#0E1117]/90 p-4 sm:p-5 transition-colors hover:border-white/15">
-            <div className="flex items-start justify-between gap-3"><div className="flex items-center gap-3"><div className="grid size-10 place-items-center rounded-xl bg-gradient-to-br from-[#24C5E3]/20 to-[#8B5CF6]/20 text-sm font-bold text-[#F5F7FA]">{name.charAt(0).toUpperCase()}</div><div><p className="text-sm font-semibold text-[#F5F7FA]">{name}</p><p className="mt-0.5 flex items-center gap-1 text-[11px] text-[#6B7280]"><Clock className="size-3" />{relativeTime(post.created_at)}<span>· Open community</span></p></div></div><button type="button" className="rounded-lg p-1.5 text-[#6B7280] hover:bg-white/5 hover:text-white"><MoreHorizontal className="size-4" /></button></div>
+          const isPinned = pinnedPosts.has(post.id);
+          const isMenuOpen = openMenu === post.id;
+          return <article id={`post-${post.id}`} key={post.id} className="rounded-2xl border border-white/[0.08] bg-[#0E1117]/90 p-4 sm:p-5 transition-colors hover:border-white/15 relative">
+            <div className="flex items-start justify-between gap-3"><div className="flex items-center gap-3"><div className="grid size-10 place-items-center rounded-xl bg-gradient-to-br from-[#24C5E3]/20 to-[#8B5CF6]/20 text-sm font-bold text-[#F5F7FA]">{name.charAt(0).toUpperCase()}</div><div><p className="text-sm font-semibold text-[#F5F7FA]">{name}</p><p className="mt-0.5 flex items-center gap-1 text-[11px] text-[#6B7280]"><Clock className="size-3" />{relativeTime(post.created_at)}<span>· Open community</span></p></div></div>
+              <div className="relative">
+                <button type="button" onClick={() => toggleMenu(post.id)} className="rounded-lg p-1.5 text-[#6B7280] hover:bg-white/5 hover:text-white" aria-label="More options" aria-expanded={isMenuOpen}>
+                  <MoreHorizontal className="size-4" />
+                </button>
+                {isMenuOpen && (
+                  <div className="absolute right-0 top-full mt-1 rounded-xl border border-white/10 bg-[#0E1117] shadow-lg py-1 z-10 min-w-[160px] animate-fade-in">
+                    <button type="button" onClick={() => copyPostLink(post.id)} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#F5F7FA] hover:bg-white/5">
+                      <Link2 className="size-4" />
+                      Copy link
+                    </button>
+                    <button type="button" onClick={() => reportPost(post.id)} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#FF4D67] hover:bg-white/5">
+                      <Flag className="size-4" />
+                      Report post
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
             <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-[#D7DCE3]">{post.body}</p>
-            <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-white/[0.06] pt-3"><span className="text-[11px] text-[#6B7280]">{totalReactions} reactions · {post.comments.length} replies</span><span className="flex-1" />{reactionOptions.map(({ key, label, icon: Icon }) => { const active = post.viewerReactions.includes(key); return <button key={key} type="button" onClick={() => void toggleReaction(post.id, key)} disabled={busyKey === `reaction:${post.id}:${key}`} className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-colors ${active ? "bg-[#24C5E3]/15 text-[#24C5E3]" : "text-[#6B7280] hover:bg-white/5 hover:text-white"}`}><Icon className="size-3.5" />{label}{post.reactionCounts[key] ? ` ${post.reactionCounts[key]}` : ""}</button>})}<button type="button" onClick={() => void sharePost(post.id)} className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-[#6B7280] hover:bg-white/5 hover:text-white"><Globe className="size-3.5" />Share</button><button type="button" className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-[#6B7280] hover:bg-white/5 hover:text-white"><Pin className="size-3.5" /></button></div>
+            <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-white/[0.06] pt-3"><span className="text-[11px] text-[#6B7280]">{totalReactions} reactions · {post.comments.length} replies</span><span className="flex-1" />{reactionOptions.map(({ key, label, icon: Icon }) => { const active = post.viewerReactions.includes(key); return <button key={key} type="button" onClick={() => void toggleReaction(post.id, key)} disabled={busyKey === `reaction:${post.id}:${key}`} className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-colors ${active ? "bg-[#24C5E3]/15 text-[#24C5E3]" : "text-[#6B7280] hover:bg-white/5 hover:text-white"}`}><Icon className="size-3.5" />{label}{post.reactionCounts[key] ? ` ${post.reactionCounts[key]}` : ""}</button>})}<button type="button" onClick={() => void sharePost(post.id)} className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-[#6B7280] hover:bg-white/5 hover:text-white"><Globe className="size-3.5" />Share</button><button type="button" onClick={() => togglePin(post.id)} className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-colors ${isPinned ? "bg-[#8B5CF6]/15 text-[#8B5CF6]" : "text-[#6B7280] hover:bg-white/5 hover:text-white"}`} aria-label={isPinned ? "Unpin post" : "Pin post"}><Pin className="size-3.5" /></button></div>
             {post.comments.slice(-3).map((comment) => { const commentName = authorName(comment.profiles); return <div key={comment.id} className="mt-3 rounded-xl bg-[#11151C] px-3 py-2.5"><div className="flex items-center gap-2"><span className="grid size-6 place-items-center rounded-lg bg-white/5 text-[10px] font-bold text-[#A7AFBC]">{commentName.charAt(0).toUpperCase()}</span><span className="text-xs font-semibold text-[#F5F7FA]">{commentName}</span><span className="text-[10px] text-[#6B7280]">{relativeTime(comment.created_at)}</span></div><p className="mt-1 pl-8 text-xs leading-5 text-[#A7AFBC]">{comment.body}</p></div>})}
             <div className="mt-3 flex items-center gap-2"><MessageSquare className="ml-1 size-4 text-[#6B7280]" /><input value={commentDrafts[post.id] ?? ""} onChange={(event) => setCommentDrafts((current) => ({ ...current, [post.id]: event.target.value }))} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void addComment(post.id); } }} placeholder="Join the conversation..." className="h-9 min-w-0 flex-1 rounded-lg border border-white/10 bg-[#07090D] px-3 text-xs text-[#F5F7FA] outline-none placeholder:text-[#6B7280] focus:border-[#24C5E3]/50" /><button type="button" onClick={() => void addComment(post.id)} disabled={busyKey === `comment:${post.id}` || !commentDrafts[post.id]?.trim()} className="grid size-9 place-items-center rounded-lg bg-[#24C5E3] text-[#07090D] transition-opacity disabled:opacity-40"><ArrowRight className="size-3.5" /></button></div>
           </article>;

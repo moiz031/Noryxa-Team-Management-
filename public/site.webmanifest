@@ -1,0 +1,42 @@
+{
+  "name": "NORYXA Agency Command Center",
+  "short_name": "NORYXA",
+  "description": "Intelligent operating system for AI Automation, Digital Marketing, eCommerce, Software & Growth.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07090D",
+  "theme_color": "#07090D",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Admin Portal",
+      "short_name": "Admin",
+      "description": "Access admin command center",
+      "url": "/admin/login",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Employee Portal",
+      "short_name": "Employee",
+      "description": "Access employee workspace",
+      "url": "/login",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

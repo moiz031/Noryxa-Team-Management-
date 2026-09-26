@@ -210,6 +210,9 @@ export function AppShell({
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="lg:hidden rounded-lg p-2 text-[#A7AFBC] hover:bg-white/5 hover:text-white"
+              aria-label={mobileMenuOpen ? "Close main menu" : "Open main menu"}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu-drawer"
             >
               {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
             </button>
@@ -259,11 +262,11 @@ export function AppShell({
             <Link
               href="/notifications"
               className="relative rounded-xl border border-white/[0.08] bg-[#0E1117] p-2 text-[#A7AFBC] hover:border-white/20 hover:text-white transition-colors"
-              title="Notifications"
+              aria-label={`Notifications${liveUnreadCount > 0 ? `, ${liveUnreadCount} unread` : ""}`}
             >
               <Bell className="size-4" />
               {liveUnreadCount > 0 && (
-                <span className="absolute -right-1 -top-1 grid size-4 place-items-center rounded-full bg-[#39FF14] text-[9px] font-bold text-[#07090D] shadow-[0_0_8px_rgba(57,255,20,0.6)]">
+                <span className="absolute -right-1 -top-1 grid size-4 place-items-center rounded-full bg-[#39FF14] text-[9px] font-bold text-[#07090D] shadow-[0_0_8px_rgba(57,255,20,0.6)]" aria-hidden="true">
                   {liveUnreadCount > 9 ? "9+" : liveUnreadCount}
                 </span>
               )}
@@ -383,6 +386,8 @@ export function AppShell({
               type="button"
               onClick={() => setCollapsed(!collapsed)}
               className="rounded-lg p-1.5 text-[#A7AFBC] hover:bg-white/5 hover:text-white transition-colors"
+              aria-label={collapsed ? "Expand navigation sidebar" : "Collapse navigation sidebar"}
+              aria-expanded={!collapsed}
             >
               {collapsed ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
             </button>
@@ -396,7 +401,7 @@ export function AppShell({
               className="fixed inset-0 bg-[#07090D]/80 backdrop-blur-md"
               onClick={() => setMobileMenuOpen(false)}
             />
-            <div className="relative z-10 w-72 h-full bg-[#0A0D12] border-r border-white/10 p-5 flex flex-col animate-drawer-in">
+            <div id="mobile-menu-drawer" className="relative z-10 w-72 h-full bg-[#0A0D12] border-r border-white/10 p-5 flex flex-col animate-drawer-in">
               <div className="flex items-center justify-between pb-4 border-b border-white/10">
                   <div className="flex items-center gap-2">
                     <Image src="/noryxa-mark.svg" alt="NoryXA" width={32} height={32} className="size-8" />
@@ -406,6 +411,7 @@ export function AppShell({
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
                   className="rounded-lg p-1 text-[#A7AFBC] hover:text-white"
+                  aria-label="Close main menu"
                 >
                   <X className="size-5" />
                 </button>

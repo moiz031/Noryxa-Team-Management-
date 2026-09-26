@@ -40,6 +40,7 @@ export async function POST(request: Request) {
       name: body.name.trim(),
       description: body.description?.trim() || null,
       client_name: body.clientName?.trim() || null,
+      client_id: body.clientId ?? body.client_id ?? null,
       status: body.status || "planning",
       department_id: body.departmentId || null,
       starts_on: body.startsOn || null,

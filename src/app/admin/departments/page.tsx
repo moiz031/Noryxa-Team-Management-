@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/roles";
-import { getDepartments } from "@/lib/db/departments";
+import { getDepartments, createDepartment } from "@/lib/db/departments";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
@@ -25,21 +26,12 @@ export default async function DepartmentsPage() {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/api/admin/departments`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name?.trim(),
-          description: description?.trim() || undefined,
-        }),
-      }
-    );
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Authentication required");
 
-    if (res.ok) {
-      redirect("/admin/departments");
-    }
+    const department = await createDepartment({ name: name?.trim(), description: description?.trim() || null, created_by: user.id });
+    redirect("/admin/departments");
   }
 
   return (

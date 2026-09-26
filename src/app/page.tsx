@@ -13,6 +13,37 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL
+  ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
+const softwareApplicationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "NORYXA Agency Command Center",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Cloud",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+    availability: "https://schema.org/InStock",
+  },
+  description: "Intelligent operating system for AI Automation, Digital Marketing, eCommerce, Software & Growth. Orchestrates people, client deliverables, daily telemetry, attendance, secure knowledge, and audit trails inside one unified digital headquarters.",
+  featureList: [
+    "AI Automation Core",
+    "Role-Enforced Security",
+    "Realtime Telemetry",
+    "Unified Project Hub",
+    "Isolated File Storage",
+    "Forensic Audit Logging",
+  ],
+  author: {
+    "@type": "Organization",
+    name: "NORYXA",
+    url: siteUrl,
+  },
+};
+
 const capabilities = [
   {
     icon: Cpu,
@@ -53,15 +84,20 @@ const capabilities = [
 ];
 
 const telemetryStats = [
-  { label: "Active Systems", value: "99.98%", subtext: "Operational uptime" },
+  { label: "Active Systems", value: "Connected", subtext: "Operational workspace" },
   { label: "Role Isolation", value: "Strict RLS", subtext: "Postgres-enforced" },
-  { label: "Realtime Latency", value: "< 24ms", subtext: "WebSocket stream" },
-  { label: "Data Integrity", value: "Zero Loss", subtext: "Immutable logging" },
+  { label: "Realtime Events", value: "Enabled", subtext: "Live workspace stream" },
+  { label: "Data Integrity", value: "Audited", subtext: "Activity trail enabled" },
 ];
 
 export default function Home() {
   return (
     <main className="relative min-h-screen bg-[#07090D] text-[#F5F7FA] overflow-hidden noryxa-grid-bg">
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationJsonLd) }}
+      />
       {/* Background ambient light orbs */}
       <div className="absolute -top-40 left-1/2 -translate-x-1/2 size-[650px] rounded-full bg-gradient-to-b from-[#39FF14]/15 via-[#24C5E3]/10 to-transparent blur-[140px] pointer-events-none" />
       <div className="absolute top-1/2 -right-40 size-[500px] rounded-full bg-[#8B5CF6]/10 blur-[150px] pointer-events-none" />
