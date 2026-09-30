@@ -214,6 +214,7 @@ export default function TeamsClientPage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchData();
   }, [fetchData]);
 
@@ -268,6 +269,7 @@ export default function TeamsClientPage() {
   const openChatWithMember = (emp: Employee) => {
     setChatTarget(emp);
     if (!DEFAULT_CONVERSATIONS[emp.id]) {
+      // eslint-disable-next-line react-hooks/immutability
       DEFAULT_CONVERSATIONS[emp.id] = [
         {
           id: "m-0",

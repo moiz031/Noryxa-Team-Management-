@@ -521,7 +521,7 @@ export default function ProfilePage() {
                     </span>
                   </div>
                   <p className="text-xs text-[#24C5E3] font-semibold mt-0.5">{bizCategory}</p>
-                  <p className="text-xs text-[#A7AFBC] mt-2 italic leading-relaxed">"{bizAbout}"</p>
+                  <p className="text-xs text-[#A7AFBC] mt-2 italic leading-relaxed">&quot;{bizAbout}&quot;</p>
 
                   <div className="mt-4 flex flex-wrap items-center justify-center sm:justify-start gap-2 text-[11px]">
                     <span className="inline-flex items-center gap-1 rounded-full bg-[#39FF14]/10 border border-[#39FF14]/25 px-2.5 py-0.5 text-[#39FF14] font-medium">
