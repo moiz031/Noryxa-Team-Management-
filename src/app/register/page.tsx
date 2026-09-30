@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { Button } from "@/components/ui/button";
-import { AuthCard } from "@/app/login/page";
+import { AuthCard } from "@/components/auth/auth-card";
 import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 
 export default function RegisterPage() {

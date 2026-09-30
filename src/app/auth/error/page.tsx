@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AuthCard } from "@/app/login/page";
+import { AuthCard } from "@/components/auth/auth-card";
 import { AlertTriangle, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

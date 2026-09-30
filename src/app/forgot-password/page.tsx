@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { Button } from "@/components/ui/button";
-import { AuthCard } from "@/app/login/page";
+import { AuthCard } from "@/components/auth/auth-card";
 import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 
 export default function ForgotPasswordPage() {

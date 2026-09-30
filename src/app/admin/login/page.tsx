@@ -4,8 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
-import { AuthCard } from "@/app/login/page";
 import { Shield, Loader2, AlertCircle } from "lucide-react";
 
 export default function AdminLoginPage() {

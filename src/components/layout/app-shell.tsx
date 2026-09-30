@@ -128,6 +128,7 @@ export function AppShell({
         { label: "Learn & Tips", href: "/learn", icon: FileText, sectionKey: "learning" as const },
         { label: "My Earnings", href: "/earnings", icon: Wallet, sectionKey: "earnings" as const },
         { label: "Documents", href: "/documents", icon: FileText, sectionKey: "documents" as const },
+        { label: "My Profile", href: "/profile", icon: Users, sectionKey: "employees" as const },
         { label: "Notifications", href: "/notifications", icon: Bell, sectionKey: "notifications" as const },
         { label: "Analytics", href: "/analytics", icon: Activity, sectionKey: "analytics" as const },
         { label: "My Scorecard", href: "/scorecard", icon: Zap, sectionKey: "scorecard" as const },
@@ -146,6 +147,7 @@ export function AppShell({
         { label: "Employees", href: "/admin/employees", icon: Users, sectionKey: "employees" as const },
         { label: "Departments", href: "/admin/departments", icon: Building2, sectionKey: "departments" as const },
         { label: "Teams", href: "/admin/teams", icon: Layers, sectionKey: "teams" as const },
+        { label: "My Profile", href: "/admin/profile", icon: Users, sectionKey: "employees" as const },
       ],
     },
     {
@@ -274,14 +276,14 @@ export function AppShell({
 
             {/* User Profile / Status */}
             <div className="flex items-center gap-3 border-l border-white/[0.08] pl-3 sm:pl-4">
-              <div className="hidden sm:block text-right">
-                <p className="text-xs font-medium text-[#F5F7FA] truncate max-w-[140px]">
+              <Link href="/profile" className="hidden sm:block text-right group">
+                <p className="text-xs font-medium text-[#F5F7FA] truncate max-w-[140px] group-hover:text-[#39FF14] transition-colors">
                   {userEmail ?? "Team Member"}
                 </p>
                 <p className="text-[10px] uppercase tracking-wider text-[#39FF14] font-semibold">
                   {role}
                 </p>
-              </div>
+              </Link>
 
               {/* Sign out */}
               <form action="/auth/signout" method="post">
