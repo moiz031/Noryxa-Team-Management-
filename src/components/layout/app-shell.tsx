@@ -52,7 +52,7 @@ export function AppShell({
   unreadCount = 0,
   unreadBySection = {},
 }: AppShellProps) {
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
   const [collapsed, setCollapsed] = React.useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = React.useState(false);
