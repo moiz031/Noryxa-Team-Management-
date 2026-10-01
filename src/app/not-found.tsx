@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 export default function NotFound() {
   return (
     <div className="grid min-h-screen place-items-center bg-[#07090D] px-6">
